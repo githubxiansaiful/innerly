@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ThemeMode } from '@/lib/world/types';
 import { useAudio } from '@/lib/audio/AudioContext';
 
@@ -11,28 +11,34 @@ interface WorldHeaderProps {
   onOpenLetGo?: () => void;
 }
 
-function getLiveTime(): string {
-  const now = new Date();
-  let hours = now.getHours();
-  const minutes = now.getMinutes();
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  hours = hours % 12;
-  hours = hours ? hours : 12;
-  const hStr = hours < 10 ? `0${hours}` : `${hours}`;
-  const mStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
-  return `${hStr}:${mStr} ${ampm}`;
-}
-
-function subscribeClock(callback: () => void) {
-  const timer = setInterval(callback, 1000);
-  return () => clearInterval(timer);
-}
-
 export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
-  // Subscribe to live client time; returns '' during SSR to avoid hydration mismatch
-  const timeString = useSyncExternalStore(subscribeClock, getLiveTime, () => '');
+  const [timeString, setTimeString] = useState<string>('');
   const { isPlaying, toggleSound } = useAudio();
   const [a11yHighContrast, setA11yHighContrast] = useState<boolean>(false);
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const hStr = hours < 10 ? `0${hours}` : `${hours}`;
+      const mStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
+      setTimeString(`${hStr}:${mStr} ${ampm}`);
+    };
+
+    // Update on client tick without synchronous cascading render
+    const frameId = requestAnimationFrame(() => {
+      updateTime();
+    });
+    const intervalId = setInterval(updateTime, 1000);
+    return () => {
+      cancelAnimationFrame(frameId);
+      clearInterval(intervalId);
+    };
+  }, []);
 
   const toggleA11y = () => {
     setA11yHighContrast((prev) => !prev);
@@ -56,6 +62,7 @@ export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
       {/* Center: Clock Pill matching user's exact specification */}
       <div
         data-sky-avoid="true"
+        suppressHydrationWarning
         className={`zuzu-clock absolute left-[calc(50%-12px)] sm:left-1/2 -translate-x-1/2 text-[0.625rem] md:text-xs tracking-[0.2em] sm:tracking-[0.3em] font-medium uppercase z-50 top-1/2 -translate-y-1/2 px-3 sm:px-4 py-2 rounded-full backdrop-blur-md border text-night-ink bg-white/5 border-white/10 pointer-events-auto transition-opacity duration-150 ${
           timeString ? 'opacity-100' : 'opacity-0'
         }`}

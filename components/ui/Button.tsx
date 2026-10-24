@@ -33,15 +33,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       default:
-        'text-[#FFFFFF] hover:bg-white/[0.06] hover:text-white',
+        'text-[#FFFFFF] [data-theme=day]:text-[#000000] hover:bg-white/[0.06] [data-theme=day]:hover:bg-black/[0.04]',
       glass:
-        'text-[#FFFFFF] hover:bg-white/[0.08] hover:text-white',
+        'text-[#FFFFFF] [data-theme=day]:text-[#000000] hover:bg-white/[0.08] [data-theme=day]:hover:bg-black/[0.04]',
       elevated:
-        'bg-white/[0.03] text-[#FFFFFF] hover:bg-white/[0.08]',
+        'bg-white/[0.03] [data-theme=day]:bg-black/[0.04] text-[#FFFFFF] [data-theme=day]:text-[#000000] hover:bg-white/[0.08]',
       solid:
-        'bg-[#FFFFFF] text-[#000000] hover:bg-[#e5e5e5] shadow-none',
+        'bg-[#FFFFFF] [data-theme=day]:bg-[#000000] text-[#000000] [data-theme=day]:text-[#FFFFFF] hover:bg-[#e5e5e5] [data-theme=day]:hover:bg-[#222222] shadow-none',
       ghost:
-        'bg-transparent text-[#949494] shadow-none hover:text-[#FFFFFF] hover:bg-white/5',
+        'bg-transparent text-[#949494] [data-theme=day]:text-[#555555] shadow-none hover:text-[#FFFFFF] [data-theme=day]:hover:text-[#000000] hover:bg-white/5',
     }[variant];
 
     return (
