@@ -40,7 +40,7 @@ export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
   };
 
   const isDay = theme === 'day';
-  const textClass = isDay ? 'text-[#16324a]' : 'text-white';
+  const textClass = isDay ? 'text-black' : 'text-white';
 
   return (
     <header className="fixed top-5 sm:top-6 inset-x-0 mx-auto w-[94%] max-w-[1232px] z-50 relative flex items-center justify-between pointer-events-none select-none">
@@ -48,7 +48,7 @@ export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
       <div
         className={`liquid-glass px-5 py-1 sm:py-1.5 rounded-full pointer-events-auto flex items-center justify-center transition-all duration-150 ${textClass}`}
       >
-        <span className="font-serif text-[28px] sm:text-[30px] font-normal leading-[1.1] tracking-[-0.5px]">
+        <span className="font-serif text-[26px] font-normal leading-[1.1] tracking-[-0.5px]">
           Miwa
         </span>
       </div>
