@@ -41,8 +41,13 @@
 }
 
 [data-theme="day"] .liquid-glass {
-  background: rgba(255, 255, 255, 0.45);
-  box-shadow: rgba(255, 255, 255, 0.6) 0px 1px 1px inset;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: rgba(255, 255, 255, 0.8) 0px 1px 1px inset;
+  color: #16324a;
+}
+
+[data-theme="day"] .liquid-glass:hover {
+  background: rgba(255, 255, 255, 0.75);
 }
 
 .liquid-glass-pill {
@@ -106,13 +111,49 @@ body {
   width: 5px;
   height: 5px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #262626;
   border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #333333;
+}
+
+.liquid-glass::before,
+.liquid-glass:before {
+  content: "";
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(#ffffff73, #ffffff26 20%, #fff0 40% 60%, #ffffff26 80%, #ffffff73);
+  padding: 1.4px;
+  position: absolute;
+  inset: 0;
+
+  /* WebKit prefix (Chrome, Edge, Safari) */
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  -webkit-mask-clip: content-box, border-box;
+
+  /* Standard CSS (Firefox, Chrome, Edge, Safari) */
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  mask-clip: content-box, border-box;
+}
+
+[data-theme="day"] .liquid-glass::before,
+[data-theme="day"] .liquid-glass:before {
+  background: linear-gradient(
+    180deg,
+    rgba(22, 50, 74, 0.38) 0%,
+    rgba(22, 50, 74, 0.22) 25%,
+    rgba(22, 50, 74, 0.1) 45% 55%,
+    rgba(22, 50, 74, 0.22) 75%,
+    rgba(22, 50, 74, 0.38) 100%
+  );
 }

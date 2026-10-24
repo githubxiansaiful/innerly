@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScenicBackground } from '@/components/home/ScenicBackground';
 import { WorldHeader } from '@/components/home/WorldHeader';
 import { FeatureNavigation } from '@/components/home/FeatureNavigation';
@@ -10,13 +10,23 @@ import { AudioProvider } from '@/lib/audio/AudioContext';
 export default function HomePage() {
   const [theme, setTheme] = useState<ThemeMode>('night'); // Default to night scene
 
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'day' ? 'night' : 'day'));
   };
 
+  const isDay = theme === 'day';
+
   return (
     <AudioProvider>
-      <main className="relative w-full h-full overflow-hidden select-none bg-black text-white">
+      <main
+        className={`relative w-full h-full overflow-hidden select-none transition-colors duration-500 ${
+          isDay ? 'text-[#16324a]' : 'bg-black text-white'
+        }`}
+      >
         {/* Scenic Background from home-bg.html */}
         <ScenicBackground theme={theme} onThemeChange={setTheme} />
 
