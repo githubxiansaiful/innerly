@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Innerly — A quiet place to breathe",
+  title: "Miwa — A quiet place to breathe",
   description:
     "An interactive emotional wellness space set within a living, animated natural landscape.",
 };

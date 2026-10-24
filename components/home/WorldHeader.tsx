@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { ThemeMode } from '@/lib/world/types';
-import { ThemeToggle } from './ThemeToggle';
 import { useAudio } from '@/lib/audio/AudioContext';
 
 interface WorldHeaderProps {
@@ -13,19 +12,21 @@ interface WorldHeaderProps {
 }
 
 export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
-  const [localTime, setLocalTime] = useState<string>('');
+  const [timeString, setTimeString] = useState<string>('');
   const { isPlaying, toggleSound } = useAudio();
+  const [a11yHighContrast, setA11yHighContrast] = useState<boolean>(false);
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      setLocalTime(
-        now.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        })
-      );
+      let hours = now.getHours();
+      const minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const hStr = hours < 10 ? `0${hours}` : `${hours}`;
+      const mStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
+      setTimeString(`${hStr}:${mStr} ${ampm}`);
     };
 
     updateTime();
@@ -33,83 +34,142 @@ export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
     return () => clearInterval(timer);
   }, []);
 
+  const toggleA11y = () => {
+    setA11yHighContrast((prev) => !prev);
+    document.documentElement.classList.toggle('a11y-high-contrast');
+  };
+
+  const isDay = theme === 'day';
+  const textClass = isDay ? 'text-[#16324a]' : 'text-white';
+  const clockTextClass = isDay ? 'text-[#16324a]/80' : 'text-white/90';
+
   return (
-    <header
-      className="fixed top-4 sm:top-6 inset-x-0 mx-auto w-[94%] max-w-4xl z-60 rounded-full px-4 sm:px-6 py-2.5 bg-[#000000]/85 backdrop-blur-md border border-white/15 text-white shadow-none flex items-center justify-between transition-all duration-150"
-    >
-      {/* Brand Wordmark (Instrument Serif 16px 400 as specified) */}
-      <div className="flex items-center space-x-2.5 select-none">
-        <span
-          className="w-6 h-6 rounded-full bg-[#141414] border border-white/20 flex items-center justify-center text-white"
-          aria-hidden="true"
-        >
-          {/* Minimalist seed glyph */}
-          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-        </span>
-        <span className="font-serif text-[18px] font-normal tracking-tight text-white leading-[1.2]">
-          Innerly
-        </span>
-        <span className="hidden sm:inline-block text-[10px] font-sans font-medium uppercase tracking-[0.18em] text-[#949494] pl-1">
-          monochrome
+    <header className="fixed top-5 sm:top-6 inset-x-0 mx-auto w-[94%] max-w-[1232px] z-50 flex items-center justify-between pointer-events-none select-none">
+      {/* Left: Brand Pill matching Screenshot_5 */}
+      <div
+        className={`liquid-glass-pill px-5 py-1 sm:py-1.5 rounded-full pointer-events-auto flex items-center justify-center transition-all duration-150 ${textClass}`}
+      >
+        <span className="font-serif text-[28px] sm:text-[30px] font-normal leading-[1.1] tracking-[-0.5px]">
+          Miwa
         </span>
       </div>
 
-      {/* Local Time Display (Inter/Mono 11px font-medium muted text) */}
-      <div className="hidden sm:flex items-center space-x-2 text-[11px] font-mono font-medium tracking-wider text-[#949494]">
-        <span className="w-1.5 h-1.5 rounded-full bg-white opacity-60" aria-hidden="true" />
-        <span>{localTime || '--:--:--'}</span>
+      {/* Center: Clock Pill matching Screenshot_5 */}
+      <div
+        className={`liquid-glass-pill px-5 py-2.5 rounded-full pointer-events-auto hidden sm:flex items-center justify-center transition-all duration-150 ${clockTextClass}`}
+      >
+        <span className="font-sans text-[12px] font-semibold tracking-[0.25em]">
+          {timeString || '12:00 AM'}
+        </span>
       </div>
 
-      {/* Right Controls (Pill buttons with 4px grid rhythm) */}
-      <div className="flex items-center space-x-2">
-        {/* Sound Toggle connected to feeling.mp3 */}
+      {/* Right: Three Action Buttons matching Screenshot_5 */}
+      <div className="flex items-center gap-2 sm:gap-2.5 pointer-events-auto">
+        {/* 1. Ambient Audio Toggle */}
         <button
           type="button"
           onClick={toggleSound}
-          className={`inline-flex items-center justify-center p-2 rounded-full border transition-all duration-150 active:scale-95 cursor-pointer shadow-none ${
-            isPlaying
-              ? 'bg-[#141414] border-white/30 text-white'
-              : 'bg-[#000000] border-white/15 text-[#949494] hover:text-white hover:bg-[#141414]'
-          }`}
-          aria-label={isPlaying ? 'Pause ambient audio' : 'Play ambient audio'}
-          title={isPlaying ? 'Ambient audio playing (feeling.mp3)' : 'Ambient audio paused'}
+          className={`liquid-glass-pill w-[38px] h-[38px] rounded-full flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer hover:border-white/30 ${textClass}`}
+          aria-label={isPlaying ? 'Pause ambient sound' : 'Play ambient sound'}
+          title={isPlaying ? 'Sound playing (click to mute)' : 'Sound muted (click to play)'}
         >
           {isPlaying ? (
             <svg
-              xmlns="http://www.w3.org/2000/svg"
+              className="w-[18px] h-[18px]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="w-4 h-4 text-white"
               aria-hidden="true"
             >
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+              <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 6a9 9 0 0 1 0 12" />
             </svg>
           ) : (
             <svg
-              xmlns="http://www.w3.org/2000/svg"
+              className="w-[18px] h-[18px]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="w-4 h-4"
               aria-hidden="true"
             >
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-              <line x1="23" y1="9" x2="17" y2="15" />
-              <line x1="17" y1="9" x2="23" y2="15" />
+              <line x1="22" y1="9" x2="16" y2="15" />
+              <line x1="16" y1="9" x2="22" y2="15" />
             </svg>
           )}
         </button>
 
-        {/* Day / Night Toggle */}
-        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+        {/* 2. Theme Toggle (Sun in night mode / Moon in day mode) */}
+        <button
+          type="button"
+          onClick={onToggleTheme}
+          className={`liquid-glass-pill w-[38px] h-[38px] rounded-full flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer hover:border-white/30 ${textClass}`}
+          aria-label={isDay ? 'Switch to night mode' : 'Switch to day mode'}
+          title={isDay ? 'Day active (switch to night)' : 'Night active (switch to day)'}
+        >
+          {isDay ? (
+            <svg
+              className="w-[18px] h-[18px]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          ) : (
+            <svg
+              className="w-[18px] h-[18px]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+            </svg>
+          )}
+        </button>
+
+        {/* 3. Accessibility Toggle */}
+        <button
+          type="button"
+          onClick={toggleA11y}
+          className={`liquid-glass-pill w-[38px] h-[38px] rounded-full flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer hover:border-white/30 ${
+            a11yHighContrast ? 'ring-2 ring-blue-400' : ''
+          } ${textClass}`}
+          aria-label="Toggle accessibility enhancements"
+          title="Accessibility settings"
+        >
+          <svg
+            className="w-[18px] h-[18px]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="4.5" r="1.8" />
+            <path d="M5 8.5c4.5 1.4 9.5 1.4 14 0" />
+            <path d="M12 9v5" />
+            <path d="M12 14l-3 6" />
+            <path d="M12 14l3 6" />
+          </svg>
+        </button>
       </div>
     </header>
   );

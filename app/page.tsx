@@ -29,7 +29,7 @@ export default function HomePage() {
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#000000]/80 border border-white/15 backdrop-blur-sm mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-white opacity-80" />
             <h1 className="font-serif text-[16px] font-normal leading-[1.5] text-white tracking-tight">
-              Innerly Sanctuary
+              Miwa Sanctuary
             </h1>
           </div>
 
