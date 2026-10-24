@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Instrument_Serif, Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-serif",
   subsets: ["latin"],
+  weight: "400",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "Innerly — A quiet place to breathe and reflect",
+  title: "Innerly — A quiet place to breathe",
   description:
     "An interactive emotional wellness space set within a living, animated natural landscape.",
 };
@@ -26,9 +28,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased select-none`}
+      className={`${instrumentSerif.variable} ${inter.variable} h-full antialiased select-none`}
     >
-      <body className="h-full w-full overflow-hidden flex flex-col">{children}</body>
+      <body className="h-full w-full overflow-hidden bg-black text-white font-sans flex flex-col">
+        {children}
+      </body>
     </html>
   );
 }

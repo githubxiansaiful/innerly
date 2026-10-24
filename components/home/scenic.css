@@ -1,0 +1,266 @@
+/* Scoped Scenic Background Styles based on Zuzu – Reflecting_ (1).html */
+
+.scenic-world {
+  --sky: linear-gradient(180deg, #040912 0%, #0a1626 35%, #12263d 60%, #35403f 82%, #6a5236 100%);
+  --text: #fff;
+  --muted: rgba(255, 255, 255, 0.55);
+  --card: rgba(14, 24, 46, 0.88);
+  --line: rgba(255, 255, 255, 0.13);
+  --glass: rgba(70, 68, 64, 0.5);
+  color-scheme: dark;
+}
+
+.scenic-world[data-theme="day"] {
+  --sky: linear-gradient(180deg, #fefefd 0%, #fbfbf9 40%, #f0f0ee 62%, #e6ebe7 100%);
+  --text: #16324a;
+  --muted: rgba(22, 50, 74, 0.6);
+  --card: rgba(255, 255, 255, 0.75);
+  --line: rgba(22, 50, 74, 0.15);
+  --glass: rgba(255, 255, 255, 0.55);
+  color-scheme: light;
+}
+
+.scenic-world .scenic-sky {
+  position: absolute;
+  inset: 0;
+  background: var(--sky);
+  transition: background 0.6s ease;
+  overflow: hidden;
+}
+
+.scenic-world .scenic-stars,
+.scenic-world .scenic-flies {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.6s ease;
+}
+
+.scenic-world .star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: scenic-tw 4s ease-in-out infinite;
+}
+
+@keyframes scenic-tw {
+  50% { opacity: 0.25; }
+}
+
+.scenic-world .fly {
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 12%, rgba(190, 235, 205, 0.75) 22%, rgba(190, 235, 205, 0.18) 55%, transparent 70%);
+  animation: scenic-drift var(--d) ease-in-out infinite alternate;
+}
+
+.scenic-world .fly.warm {
+  background: radial-gradient(circle, #fff6dc 0 12%, rgba(255, 220, 150, 0.8) 25%, rgba(255, 200, 120, 0.2) 55%, transparent 70%);
+}
+
+@keyframes scenic-drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(var(--x), var(--y)); }
+}
+
+.scenic-world[data-theme="day"] .scenic-stars,
+.scenic-world[data-theme="day"] .scenic-flies {
+  opacity: 0;
+}
+
+.scenic-world .scenic-hills {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 46%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.scenic-world .scenic-hills svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.scenic-world .scenic-hills::after {
+  content: "";
+  position: absolute;
+  inset: 34% 0 0 0;
+  opacity: 0.65;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0 1px, transparent 1.6px) 0 0 / 26px 22px,
+              radial-gradient(circle, rgba(255, 200, 80, 0.7) 0 1px, transparent 1.6px) 11px 9px / 37px 31px;
+}
+
+.scenic-world .scenic-trees {
+  position: absolute;
+  left: 13.2%;
+  bottom: 28.5vh;
+  height: 6.4vh;
+  z-index: 1;
+}
+
+.scenic-world .scenic-trees svg {
+  height: 100%;
+  width: auto;
+  display: block;
+}
+
+.scenic-world .scenic-dayfx,
+.scenic-world .scenic-bfs {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.scenic-world[data-theme="day"] .scenic-dayfx,
+.scenic-world[data-theme="day"] .scenic-bfs {
+  opacity: 1;
+}
+
+.scenic-world #sun {
+  position: absolute;
+  left: 71%;
+  top: 37.6%;
+  width: max(90px, 10vh);
+  height: max(90px, 10vh);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(253, 245, 214, 0.92) 0 60%, rgba(253, 245, 214, 0) 71%);
+}
+
+.scenic-world .cloud {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.95) 20%, rgba(232, 237, 248, 0.55) 55%, rgba(255, 255, 255, 0) 72%);
+  filter: blur(10px);
+}
+
+.scenic-world .bf {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  animation: scenic-drift var(--d) ease-in-out infinite alternate;
+}
+
+.scenic-world .bf .wg {
+  transform-origin: 12px 12px;
+  animation: scenic-flap 0.28s ease-in-out infinite alternate;
+}
+
+@keyframes scenic-flap {
+  to { transform: scaleX(0.3); }
+}
+
+.scenic-world[data-theme="day"] .stem {
+  background: linear-gradient(90deg, #3f7a35, #74b352 50%, #3f7a35) !important;
+}
+
+.scenic-world[data-theme="day"] .glow,
+.scenic-world[data-theme="day"] .bokeh {
+  display: none !important;
+}
+
+.scenic-world[data-theme="day"] .scenic-hills {
+  opacity: 1;
+}
+
+.scenic-world .scenic-mountains {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 75%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.scenic-world .scenic-mountains svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.scenic-world[data-theme="day"] .scenic-mountains {
+  opacity: 1;
+}
+
+.scenic-world .scenic-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scenic-world .layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.scenic-world .fl {
+  position: absolute;
+  bottom: -4px;
+  width: 0;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.scenic-world .stem {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(90deg, #173a22, #3f7c3c 50%, #173a22);
+}
+
+.scenic-world .glow {
+  position: absolute;
+  inset: -75%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 205, 110, 0.17), transparent 62%);
+}
+
+.scenic-world .head {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform-origin: 50% 50%;
+}
+
+.scenic-world .head svg,
+.scenic-world .leaf svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.scenic-world .leaf {
+  position: absolute;
+  left: 50%;
+}
+
+.scenic-world .bokeh {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(8px);
+  animation: scenic-pulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes scenic-pulse {
+  to {
+    opacity: 0.45;
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenic-world * {
+    animation: none !important;
+  }
+}

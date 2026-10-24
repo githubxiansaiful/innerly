@@ -2,27 +2,25 @@ import { RenderContext, WorldLayer } from '../types';
 import { DAY_PALETTE, NIGHT_PALETTE } from '../constants';
 import { lerpColor } from '../color';
 import { createPRNG, randomRange } from '../random';
-import { HillLayer } from './HillLayer';
 
 interface Leaf {
-  side: 1 | -1; // left or right
-  relativeHeight: number; // 0..1 along stem
+  side: 1 | -1;
+  relativeHeight: number;
   length: number;
+  width: number;
   angle: number;
 }
 
 interface Sunflower {
   xRatio: number;
-  hillType: 'mid' | 'near' | 'foreground';
-  customBaseYRatio?: number;
-  stemHeight: number;
+  headYRatio: number;
   headRadius: number;
   petalCount: number;
-  baseTilt: number;
   swaySpeed: number;
   phase: number;
   leaves: Leaf[];
-  depthTier: 'bg' | 'fg';
+  depthTier: 'bokeh-fg' | 'hero' | 'mid' | 'bg';
+  isLantern?: boolean;
 }
 
 export class FlowerLayer implements WorldLayer {
@@ -34,137 +32,431 @@ export class FlowerLayer implements WorldLayer {
   }
 
   private initFlowers() {
-    const prng = createPRNG(456);
+    const prng = createPRNG(888);
     this.flowers = [];
 
-    // Midground sunflowers (sprinkled along the hills)
-    const midCount = 14;
-    for (let i = 0; i < midCount; i++) {
-      const xRatio = (i + randomRange(prng, 0.1, 0.9)) / midCount;
-      this.flowers.push({
-        xRatio,
-        hillType: 'mid',
-        stemHeight: randomRange(prng, 40, 75),
-        headRadius: randomRange(prng, 10, 16),
-        petalCount: 14,
-        baseTilt: randomRange(prng, -0.15, 0.15),
-        swaySpeed: randomRange(prng, 1.2, 2.2),
-        phase: randomRange(prng, 0, Math.PI * 2),
-        leaves: [
-          { side: prng() > 0.5 ? 1 : -1, relativeHeight: 0.45, length: 18, angle: 0.5 },
-        ],
-        depthTier: 'bg',
-      });
-    }
+    // 1. Extreme Foreground Blurred Sunflower (Bottom-Left from Screenshot_1.png)
+    this.flowers.push({
+      xRatio: 0.025,
+      headYRatio: 0.77,
+      headRadius: 44,
+      petalCount: 22,
+      swaySpeed: 0.8,
+      phase: 0.2,
+      leaves: [
+        { side: 1, relativeHeight: 0.45, length: 50, width: 25, angle: 0.4 },
+        { side: -1, relativeHeight: 0.65, length: 58, width: 28, angle: 0.45 },
+      ],
+      depthTier: 'bokeh-fg',
+    });
 
-    // Near-ground sunflowers
-    const nearCount = 10;
-    for (let i = 0; i < nearCount; i++) {
-      const xRatio = (i + randomRange(prng, 0.1, 0.9)) / nearCount;
-      this.flowers.push({
-        xRatio,
-        hillType: 'near',
-        stemHeight: randomRange(prng, 70, 115),
-        headRadius: randomRange(prng, 16, 24),
-        petalCount: 16,
-        baseTilt: randomRange(prng, -0.2, 0.2),
-        swaySpeed: randomRange(prng, 1.0, 1.8),
-        phase: randomRange(prng, 0, Math.PI * 2),
-        leaves: [
-          { side: -1, relativeHeight: 0.35, length: 28, angle: 0.55 },
-          { side: 1, relativeHeight: 0.65, length: 32, angle: 0.5 },
-        ],
-        depthTier: 'bg',
-      });
-    }
+    // 2. The Iconic Hero Trio (Seen in Screenshot_2.png and on left of Screenshot_1.png)
+    // Tall Left Sunflower
+    this.flowers.push({
+      xRatio: 0.068,
+      headYRatio: 0.565,
+      headRadius: 26,
+      petalCount: 20,
+      swaySpeed: 1.0,
+      phase: 0.4,
+      leaves: [
+        { side: -1, relativeHeight: 0.35, length: 28, width: 14, angle: 0.45 },
+        { side: 1, relativeHeight: 0.52, length: 32, width: 16, angle: 0.4 },
+        { side: -1, relativeHeight: 0.72, length: 30, width: 15, angle: 0.45 },
+      ],
+      depthTier: 'hero',
+    });
 
-    // Prominent foreground sunflowers (artfully framed on the left & right sides)
-    const fgLayouts = [
-      { xRatio: 0.08, stem: 160, radius: 36, tilt: 0.12, leavesCount: 3 },
-      { xRatio: 0.18, stem: 135, radius: 30, tilt: -0.08, leavesCount: 2 },
-      { xRatio: 0.26, stem: 110, radius: 26, tilt: 0.1, leavesCount: 2 },
-      { xRatio: 0.74, stem: 120, radius: 28, tilt: -0.12, leavesCount: 2 },
-      { xRatio: 0.84, stem: 150, radius: 34, tilt: -0.15, leavesCount: 3 },
-      { xRatio: 0.93, stem: 175, radius: 40, tilt: -0.22, leavesCount: 3 },
+    // Tall Middle-Left Sunflower
+    this.flowers.push({
+      xRatio: 0.162,
+      headYRatio: 0.59,
+      headRadius: 27,
+      petalCount: 20,
+      swaySpeed: 1.05,
+      phase: 1.2,
+      leaves: [
+        { side: 1, relativeHeight: 0.38, length: 28, width: 14, angle: 0.4 },
+        { side: -1, relativeHeight: 0.55, length: 32, width: 16, angle: 0.45 },
+        { side: 1, relativeHeight: 0.72, length: 30, width: 15, angle: 0.4 },
+      ],
+      depthTier: 'hero',
+    });
+
+    // Lower Mid-Left Sunflower (Lower in the trio from Screenshot_2.png)
+    this.flowers.push({
+      xRatio: 0.135,
+      headYRatio: 0.70,
+      headRadius: 23,
+      petalCount: 18,
+      swaySpeed: 1.2,
+      phase: 2.1,
+      leaves: [
+        { side: -1, relativeHeight: 0.45, length: 26, width: 13, angle: 0.5 },
+        { side: 1, relativeHeight: 0.68, length: 28, width: 14, angle: 0.45 },
+      ],
+      depthTier: 'hero',
+    });
+
+    // Companions on the left
+    this.flowers.push({
+      xRatio: 0.155,
+      headYRatio: 0.69,
+      headRadius: 18,
+      petalCount: 16,
+      swaySpeed: 1.3,
+      phase: 3.2,
+      leaves: [{ side: 1, relativeHeight: 0.55, length: 20, width: 10, angle: 0.5 }],
+      depthTier: 'mid',
+    });
+
+    this.flowers.push({
+      xRatio: 0.175,
+      headYRatio: 0.82,
+      headRadius: 14,
+      petalCount: 15,
+      swaySpeed: 1.4,
+      phase: 0.8,
+      leaves: [{ side: -1, relativeHeight: 0.5, length: 16, width: 8, angle: 0.5 }],
+      depthTier: 'mid',
+    });
+
+    this.flowers.push({
+      xRatio: 0.195,
+      headYRatio: 0.84,
+      headRadius: 15,
+      petalCount: 15,
+      swaySpeed: 1.35,
+      phase: 1.8,
+      leaves: [{ side: 1, relativeHeight: 0.5, length: 16, width: 8, angle: 0.5 }],
+      depthTier: 'mid',
+    });
+
+    // 3. Right Hero Cluster (From Screenshot_1.png)
+    // Tallest Right Hero
+    this.flowers.push({
+      xRatio: 0.842,
+      headYRatio: 0.635,
+      headRadius: 28,
+      petalCount: 20,
+      swaySpeed: 1.0,
+      phase: 0.9,
+      leaves: [
+        { side: -1, relativeHeight: 0.32, length: 32, width: 16, angle: 0.45 },
+        { side: 1, relativeHeight: 0.48, length: 34, width: 17, angle: 0.4 },
+        { side: -1, relativeHeight: 0.68, length: 30, width: 15, angle: 0.45 },
+        { side: 1, relativeHeight: 0.82, length: 26, width: 13, angle: 0.4 },
+      ],
+      depthTier: 'hero',
+    });
+
+    // Mid Right Companion
+    this.flowers.push({
+      xRatio: 0.878,
+      headYRatio: 0.735,
+      headRadius: 22,
+      petalCount: 18,
+      swaySpeed: 1.15,
+      phase: 2.4,
+      leaves: [
+        { side: 1, relativeHeight: 0.42, length: 26, width: 13, angle: 0.45 },
+        { side: -1, relativeHeight: 0.65, length: 28, width: 14, angle: 0.5 },
+      ],
+      depthTier: 'hero',
+    });
+
+    this.flowers.push({
+      xRatio: 0.815,
+      headYRatio: 0.81,
+      headRadius: 16,
+      petalCount: 15,
+      swaySpeed: 1.3,
+      phase: 1.5,
+      leaves: [{ side: -1, relativeHeight: 0.55, length: 18, width: 9, angle: 0.5 }],
+      depthTier: 'mid',
+    });
+
+    this.flowers.push({
+      xRatio: 0.895,
+      headYRatio: 0.80,
+      headRadius: 16,
+      petalCount: 15,
+      swaySpeed: 1.25,
+      phase: 2.8,
+      leaves: [{ side: 1, relativeHeight: 0.55, length: 18, width: 9, angle: 0.5 }],
+      depthTier: 'mid',
+    });
+
+    // 4. Midfield Sunflowers (Including the Lantern Flower from Screenshot_1.png)
+    const midFieldSpecs = [
+      { x: 0.245, y: 0.80, r: 15 },
+      { x: 0.305, y: 0.84, r: 13 },
+      { x: 0.385, y: 0.86, r: 12 },
+      { x: 0.440, y: 0.85, r: 13 },
+      { x: 0.470, y: 0.87, r: 14 },
+      { x: 0.495, y: 0.795, r: 15 },
+      { x: 0.520, y: 0.875, r: 14 },
+      { x: 0.555, y: 0.818, r: 16, isLantern: true }, // Radiant Lantern Flower
+      { x: 0.575, y: 0.88, r: 12 },
+      { x: 0.605, y: 0.86, r: 13 },
+      { x: 0.678, y: 0.795, r: 15 },
+      { x: 0.695, y: 0.81, r: 15 },
+      { x: 0.712, y: 0.865, r: 14 },
+      { x: 0.745, y: 0.81, r: 15 },
+      { x: 0.785, y: 0.85, r: 13 },
     ];
 
-    for (const fg of fgLayouts) {
-      const leaves: Leaf[] = [];
-      for (let j = 0; j < fg.leavesCount; j++) {
-        leaves.push({
-          side: j % 2 === 0 ? 1 : -1,
-          relativeHeight: 0.25 + j * 0.25,
-          length: randomRange(prng, 35, 55),
-          angle: randomRange(prng, 0.45, 0.65),
-        });
-      }
+    for (const spec of midFieldSpecs) {
+      this.flowers.push({
+        xRatio: spec.x,
+        headYRatio: spec.y,
+        headRadius: spec.r,
+        petalCount: 16,
+        swaySpeed: randomRange(prng, 1.1, 1.6),
+        phase: randomRange(prng, 0, Math.PI * 2),
+        leaves: [
+          { side: prng() > 0.5 ? 1 : -1, relativeHeight: 0.55, length: spec.r * 1.2, width: spec.r * 0.55, angle: 0.5 },
+        ],
+        depthTier: 'mid',
+        isLantern: spec.isLantern,
+      });
+    }
+
+    // 5. Background Field Sunflowers
+    const bgCount = 30;
+    for (let i = 0; i < bgCount; i++) {
+      const xRatio = (i + randomRange(prng, 0.1, 0.9)) / bgCount;
+      const headYRatio = randomRange(prng, 0.84, 0.94);
+      const headRadius = randomRange(prng, 7, 11);
 
       this.flowers.push({
-        xRatio: fg.xRatio,
-        hillType: 'foreground',
-        customBaseYRatio: 0.98,
-        stemHeight: fg.stem,
-        headRadius: fg.radius,
-        petalCount: 20,
-        baseTilt: fg.tilt,
-        swaySpeed: randomRange(prng, 0.9, 1.4),
+        xRatio,
+        headYRatio,
+        headRadius,
+        petalCount: 13,
+        swaySpeed: randomRange(prng, 1.2, 1.8),
         phase: randomRange(prng, 0, Math.PI * 2),
-        leaves,
-        depthTier: 'fg',
+        leaves: [],
+        depthTier: 'bg',
       });
     }
   }
 
-  private drawSunflower(
+  // Renders a high-fidelity sunflower head matching Screenshot_2.png & Screenshot_1.png
+  private drawSunflowerHead(
     ctx: CanvasRenderingContext2D,
     f: Sunflower,
-    rc: RenderContext,
-    stemColor: string,
-    leafColor: string,
+    r: number,
     outerPetalColor: string,
     innerPetalColor: string,
+    creaseColor: string,
     centerDarkColor: string,
     centerRingColor: string,
     centerLightColor: string,
-    glowColor: string
+    isBlurred = false
+  ) {
+    const petalLen = r * 1.38;
+    const petalW = (r * Math.PI) / f.petalCount;
+
+    // 1. Outer Layer Petals (with pointed tip and center crease from Screenshot_2.png)
+    ctx.fillStyle = outerPetalColor;
+    for (let i = 0; i < f.petalCount; i++) {
+      const angle = (i * Math.PI * 2) / f.petalCount;
+      ctx.save();
+      ctx.rotate(angle);
+
+      ctx.beginPath();
+      ctx.moveTo(0, r * 0.65);
+      ctx.quadraticCurveTo(petalW * 0.85, r * 1.1, 0, r + petalLen);
+      ctx.quadraticCurveTo(-petalW * 0.85, r * 1.1, 0, r * 0.65);
+      ctx.fill();
+
+      // Sharp center crease spine on each petal (from Screenshot_2.png)
+      if (!isBlurred) {
+        ctx.strokeStyle = creaseColor;
+        ctx.lineWidth = Math.max(0.7, r * 0.04);
+        ctx.beginPath();
+        ctx.moveTo(0, r * 0.72);
+        ctx.lineTo(0, r + petalLen * 0.92);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // 2. Inner Layer Petals (interleaved for natural richness)
+    ctx.fillStyle = innerPetalColor;
+    for (let i = 0; i < f.petalCount; i++) {
+      const angle = ((i + 0.5) * Math.PI * 2) / f.petalCount;
+      ctx.save();
+      ctx.rotate(angle);
+
+      ctx.beginPath();
+      ctx.moveTo(0, r * 0.6);
+      ctx.quadraticCurveTo(petalW * 0.75, r * 0.95, 0, r + petalLen * 0.82);
+      ctx.quadraticCurveTo(-petalW * 0.75, r * 0.95, 0, r * 0.6);
+      ctx.fill();
+
+      if (!isBlurred) {
+        ctx.strokeStyle = creaseColor;
+        ctx.lineWidth = Math.max(0.6, r * 0.035);
+        ctx.beginPath();
+        ctx.moveTo(0, r * 0.68);
+        ctx.lineTo(0, r + petalLen * 0.76);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // 3. Stippled Seed Ring (Seed florets around perimeter from Screenshot_2.png)
+    if (!isBlurred && r >= 14) {
+      const seedCount = f.petalCount * 2;
+      ctx.fillStyle = centerRingColor;
+      for (let s = 0; s < seedCount; s++) {
+        const seedAngle = (s * Math.PI * 2) / seedCount;
+        const sx = Math.cos(seedAngle) * (r * 0.82);
+        const sy = Math.sin(seedAngle) * (r * 0.82);
+        ctx.beginPath();
+        ctx.arc(sx, sy, Math.max(1, r * 0.06), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // 4. Dark Center Disc Core (with 3D domed spherical shading)
+    const discRadius = r * 0.74;
+    const discGrad = ctx.createRadialGradient(
+      -discRadius * 0.15,
+      -discRadius * 0.15,
+      discRadius * 0.1,
+      0,
+      0,
+      discRadius
+    );
+    discGrad.addColorStop(0, centerLightColor);
+    discGrad.addColorStop(0.55, centerRingColor);
+    discGrad.addColorStop(1, centerDarkColor);
+
+    ctx.fillStyle = discGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, discRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 5. Fine inner textured floret ring
+    if (!isBlurred && r >= 16) {
+      ctx.strokeStyle = centerLightColor;
+      ctx.lineWidth = Math.max(1, r * 0.07);
+      ctx.beginPath();
+      ctx.arc(0, 0, discRadius * 0.52, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  private drawSingleFlower(
+    ctx: CanvasRenderingContext2D,
+    f: Sunflower,
+    rc: RenderContext,
+    stemHighlight: string,
+    stemBase: string,
+    stemShadow: string,
+    stemCastShadow: string,
+    leafColor: string,
+    outerPetal: string,
+    innerPetal: string,
+    creaseColor: string,
+    centerDark: string,
+    centerRing: string,
+    centerLight: string,
+    lanternGlow: string
   ) {
     const { width, height, time, reducedMotion, pointer, themeTransition } = rc;
 
-    // Parallax
     const pX = !reducedMotion && pointer.active ? pointer.x : 0;
-    const parallaxWeight = f.depthTier === 'fg' ? 36 : f.hillType === 'near' ? 26 : 18;
-    const baseX = f.xRatio * width + pX * parallaxWeight;
+    const parallaxWeight =
+      f.depthTier === 'bokeh-fg'
+        ? 35
+        : f.depthTier === 'hero'
+        ? 24
+        : f.depthTier === 'mid'
+        ? 16
+        : 8;
 
-    let baseY: number;
-    if (f.customBaseYRatio) {
-      baseY = height * f.customBaseYRatio;
-    } else if (f.hillType === 'near') {
-      baseY = HillLayer.getNearHillY(f.xRatio, height) + 8;
-    } else {
-      baseY = HillLayer.getMidHillY(f.xRatio, height) + 6;
+    const baseX = f.xRatio * width + pX * parallaxWeight;
+    const baseY = height + 10;
+
+    const targetHeadY = f.headYRatio * height;
+    const stemLength = baseY - targetHeadY;
+
+    // Gentle natural wind sway
+    const swayAmount = reducedMotion
+      ? 0
+      : Math.sin(time * f.swaySpeed + f.phase) * (stemLength * 0.045);
+    const headX = baseX + swayAmount;
+    const headY = targetHeadY;
+
+    const ctrlX = baseX + (headX - baseX) * 0.35 - swayAmount * 0.3;
+    const ctrlY = baseY - stemLength * 0.5;
+
+    const isBlurred = f.depthTier === 'bokeh-fg';
+    const stemWidth = Math.max(2.5, f.headRadius * 0.20);
+
+    ctx.save();
+    if (isBlurred) {
+      if ('filter' in ctx) {
+        ctx.filter = 'blur(6px)';
+      }
+      ctx.globalAlpha = 0.88;
     }
 
-    // Gentle wind sway
-    const swayAmount = reducedMotion ? 0 : Math.sin(time * f.swaySpeed + f.phase) * (f.stemHeight * 0.12);
-    const headX = baseX + f.baseTilt * f.stemHeight + swayAmount;
-    const headY = baseY - f.stemHeight;
+    // 1. Stem Cast Shadow on Hill (Daytime from Screenshot_2.png)
+    if (themeTransition < 0.85 && !isBlurred && f.depthTier !== 'bg') {
+      const shadowAlpha = (1 - themeTransition) * 0.38;
+      ctx.save();
+      ctx.strokeStyle = stemCastShadow;
+      ctx.lineWidth = stemWidth * 1.4;
+      ctx.lineCap = 'round';
+      ctx.globalAlpha = shadowAlpha;
 
-    const ctrlX = baseX + (headX - baseX) * 0.35 - swayAmount * 0.2;
-    const ctrlY = baseY - f.stemHeight * 0.55;
+      // Cast shadow slants gently to the right as in Screenshot_2.png
+      ctx.beginPath();
+      ctx.moveTo(baseX, baseY);
+      ctx.quadraticCurveTo(ctrlX + stemLength * 0.08, ctrlY, headX + stemLength * 0.12, headY + 12);
+      ctx.stroke();
+      ctx.restore();
+    }
 
-    // 1. Draw Stem
-    ctx.strokeStyle = stemColor;
-    ctx.lineWidth = f.headRadius * 0.22;
+    // 2. 3D Cylindrical Stem with highlight and shadow (from Screenshot_2.png)
     ctx.lineCap = 'round';
+
+    // Base tube
+    ctx.strokeStyle = stemBase;
+    ctx.lineWidth = stemWidth;
     ctx.beginPath();
     ctx.moveTo(baseX, baseY);
     ctx.quadraticCurveTo(ctrlX, ctrlY, headX, headY);
     ctx.stroke();
 
-    // 2. Draw Leaves
+    // Shadow on right edge of cylinder
+    if (!isBlurred && stemWidth >= 3.5) {
+      ctx.strokeStyle = stemShadow;
+      ctx.lineWidth = stemWidth * 0.35;
+      ctx.beginPath();
+      ctx.moveTo(baseX + stemWidth * 0.25, baseY);
+      ctx.quadraticCurveTo(ctrlX + stemWidth * 0.25, ctrlY, headX + stemWidth * 0.25, headY);
+      ctx.stroke();
+
+      // Highlight on left edge of cylinder
+      ctx.strokeStyle = stemHighlight;
+      ctx.lineWidth = stemWidth * 0.3;
+      ctx.beginPath();
+      ctx.moveTo(baseX - stemWidth * 0.22, baseY);
+      ctx.quadraticCurveTo(ctrlX - stemWidth * 0.22, ctrlY, headX - stemWidth * 0.22, headY);
+      ctx.stroke();
+    }
+
+    // 3. Paired Spade-Shaped Green Leaves
     for (const leaf of f.leaves) {
       const t = leaf.relativeHeight;
-      // Point along quadratic bezier
       const lx = (1 - t) * (1 - t) * baseX + 2 * (1 - t) * t * ctrlX + t * t * headX;
       const ly = (1 - t) * (1 - t) * baseY + 2 * (1 - t) * t * ctrlY + t * t * headY;
 
@@ -175,135 +467,114 @@ export class FlowerLayer implements WorldLayer {
       ctx.fillStyle = leafColor;
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.quadraticCurveTo(leaf.length * 0.5, -leaf.length * 0.35, leaf.length, 0);
-      ctx.quadraticCurveTo(leaf.length * 0.5, leaf.length * 0.35, 0, 0);
+      ctx.quadraticCurveTo(leaf.length * 0.45, -leaf.width * 0.8, leaf.length, 0);
+      ctx.quadraticCurveTo(leaf.length * 0.45, leaf.width * 0.8, 0, 0);
       ctx.fill();
+
+      // Subtle leaf centerline
+      if (!isBlurred && leaf.length >= 22) {
+        ctx.strokeStyle = stemShadow;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(leaf.length * 0.85, 0);
+        ctx.stroke();
+      }
+
       ctx.restore();
     }
 
-    // 3. Night Lantern Glow around head
-    if (themeTransition > 0.05) {
-      const glowR = f.headRadius * 3.4;
-      const glowGrad = ctx.createRadialGradient(headX, headY, f.headRadius * 0.4, headX, headY, glowR);
-      glowGrad.addColorStop(0, glowColor);
-      glowGrad.addColorStop(1, 'rgba(255, 200, 80, 0)');
+    // 4. Lantern Flower Golden Flare (Nighttime from Screenshot_1.png)
+    if (f.isLantern && themeTransition > 0.05) {
+      const flareR = f.headRadius * 4.6;
+      const flareGrad = ctx.createRadialGradient(headX, headY, f.headRadius * 0.2, headX, headY, flareR);
+      flareGrad.addColorStop(0, lanternGlow);
+      flareGrad.addColorStop(0.35, 'rgba(255, 205, 80, 0.45)');
+      flareGrad.addColorStop(1, 'rgba(255, 180, 50, 0)');
 
-      ctx.fillStyle = glowGrad;
+      ctx.fillStyle = flareGrad;
       ctx.beginPath();
-      ctx.arc(headX, headY, glowR, 0, Math.PI * 2);
+      ctx.arc(headX, headY, flareR, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // 4. Sunflower Head
+    // 5. Sunflower Head
     ctx.save();
     ctx.translate(headX, headY);
-    // Face the sky slightly
-    const headTilt = f.baseTilt * 0.8 + (reducedMotion ? 0 : Math.sin(time * f.swaySpeed + f.phase) * 0.1);
-    ctx.rotate(headTilt);
+    const tilt = reducedMotion ? 0 : Math.sin(time * f.swaySpeed + f.phase) * 0.05;
+    ctx.rotate(tilt);
 
-    // Draw Outer Petals
-    const r = f.headRadius;
-    const petalLen = r * 1.5;
-    const petalW = (r * Math.PI) / f.petalCount;
+    this.drawSunflowerHead(
+      ctx,
+      f,
+      f.headRadius,
+      outerPetal,
+      innerPetal,
+      creaseColor,
+      centerDark,
+      centerRing,
+      centerLight,
+      isBlurred
+    );
 
-    ctx.fillStyle = outerPetalColor;
-    for (let i = 0; i < f.petalCount; i++) {
-      const angle = (i * Math.PI * 2) / f.petalCount;
-      ctx.save();
-      ctx.rotate(angle);
-      ctx.beginPath();
-      ctx.moveTo(0, r * 0.7);
-      ctx.quadraticCurveTo(petalW * 0.8, r * 1.2, 0, r + petalLen);
-      ctx.quadraticCurveTo(-petalW * 0.8, r * 1.2, 0, r * 0.7);
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // Draw Inner Petals (offset for lush density)
-    ctx.fillStyle = innerPetalColor;
-    for (let i = 0; i < f.petalCount; i++) {
-      const angle = ((i + 0.5) * Math.PI * 2) / f.petalCount;
-      ctx.save();
-      ctx.rotate(angle);
-      ctx.beginPath();
-      ctx.moveTo(0, r * 0.65);
-      ctx.quadraticCurveTo(petalW * 0.7, r * 1.05, 0, r + petalLen * 0.85);
-      ctx.quadraticCurveTo(-petalW * 0.7, r * 1.05, 0, r * 0.65);
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // 5. Center Disc (Dark floret seed center with textured rings)
-    // Outer rim of floret
-    ctx.fillStyle = centerRingColor;
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 0.85, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Dark core
-    ctx.fillStyle = centerDarkColor;
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 0.72, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Subtle seed highlight ring
-    ctx.strokeStyle = centerLightColor;
-    ctx.lineWidth = Math.max(1, r * 0.12);
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 0.45, 0, Math.PI * 2);
-    ctx.stroke();
-
+    ctx.restore();
     ctx.restore();
   }
 
   render(rc: RenderContext): void {
     const { ctx, themeTransition } = rc;
 
-    const stemColor = lerpColor(DAY_PALETTE.flowerStem, NIGHT_PALETTE.flowerStem, themeTransition);
-    const leafColor = lerpColor(DAY_PALETTE.flowerLeaf, NIGHT_PALETTE.flowerLeaf, themeTransition);
+    const stemHighlight = lerpColor(DAY_PALETTE.stemHighlight, NIGHT_PALETTE.stemHighlight, themeTransition);
+    const stemBase = lerpColor(DAY_PALETTE.stemBase, NIGHT_PALETTE.stemBase, themeTransition);
+    const stemShadow = lerpColor(DAY_PALETTE.stemShadow, NIGHT_PALETTE.stemShadow, themeTransition);
+    const stemCastShadow = lerpColor(DAY_PALETTE.stemCastShadow, NIGHT_PALETTE.stemCastShadow, themeTransition);
+    const leafColor = lerpColor(DAY_PALETTE.leafColor, NIGHT_PALETTE.leafColor, themeTransition);
 
     const outerPetal = lerpColor(DAY_PALETTE.sunflowerPetalOuter, NIGHT_PALETTE.sunflowerPetalOuter, themeTransition);
     const innerPetal = lerpColor(DAY_PALETTE.sunflowerPetalInner, NIGHT_PALETTE.sunflowerPetalInner, themeTransition);
+    const creaseColor = lerpColor(DAY_PALETTE.sunflowerPetalCrease, NIGHT_PALETTE.sunflowerPetalCrease, themeTransition);
 
     const centerDark = lerpColor(DAY_PALETTE.sunflowerCenterDark, NIGHT_PALETTE.sunflowerCenterDark, themeTransition);
     const centerRing = lerpColor(DAY_PALETTE.sunflowerCenterRing, NIGHT_PALETTE.sunflowerCenterRing, themeTransition);
     const centerLight = lerpColor(DAY_PALETTE.sunflowerCenterLight, NIGHT_PALETTE.sunflowerCenterLight, themeTransition);
 
-    const glow = lerpColor(DAY_PALETTE.sunflowerGlow, NIGHT_PALETTE.sunflowerGlow, themeTransition);
+    const lanternGlow = lerpColor(DAY_PALETTE.sunflowerLanternGlow, NIGHT_PALETTE.sunflowerLanternGlow, themeTransition);
 
-    // Render background flowers first, foreground flowers on top
+    // Render depth layers
     const bgFlowers = this.flowers.filter((f) => f.depthTier === 'bg');
-    const fgFlowers = this.flowers.filter((f) => f.depthTier === 'fg');
+    const midFlowers = this.flowers.filter((f) => f.depthTier === 'mid');
+    const heroFlowers = this.flowers.filter((f) => f.depthTier === 'hero');
+    const bokehFlowers = this.flowers.filter((f) => f.depthTier === 'bokeh-fg');
 
     for (const f of bgFlowers) {
-      this.drawSunflower(
-        ctx,
-        f,
-        rc,
-        stemColor,
-        leafColor,
-        outerPetal,
-        innerPetal,
-        centerDark,
-        centerRing,
-        centerLight,
-        glow
+      this.drawSingleFlower(
+        ctx, f, rc, stemHighlight, stemBase, stemShadow, stemCastShadow,
+        leafColor, outerPetal, innerPetal, creaseColor,
+        centerDark, centerRing, centerLight, lanternGlow
       );
     }
 
-    for (const f of fgFlowers) {
-      this.drawSunflower(
-        ctx,
-        f,
-        rc,
-        stemColor,
-        leafColor,
-        outerPetal,
-        innerPetal,
-        centerDark,
-        centerRing,
-        centerLight,
-        glow
+    for (const f of midFlowers) {
+      this.drawSingleFlower(
+        ctx, f, rc, stemHighlight, stemBase, stemShadow, stemCastShadow,
+        leafColor, outerPetal, innerPetal, creaseColor,
+        centerDark, centerRing, centerLight, lanternGlow
+      );
+    }
+
+    for (const f of heroFlowers) {
+      this.drawSingleFlower(
+        ctx, f, rc, stemHighlight, stemBase, stemShadow, stemCastShadow,
+        leafColor, outerPetal, innerPetal, creaseColor,
+        centerDark, centerRing, centerLight, lanternGlow
+      );
+    }
+
+    for (const f of bokehFlowers) {
+      this.drawSingleFlower(
+        ctx, f, rc, stemHighlight, stemBase, stemShadow, stemCastShadow,
+        leafColor, outerPetal, innerPetal, creaseColor,
+        centerDark, centerRing, centerLight, lanternGlow
       );
     }
   }

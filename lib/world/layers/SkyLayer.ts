@@ -8,41 +8,55 @@ export class SkyLayer implements WorldLayer {
   render(rc: RenderContext): void {
     const { ctx, width, height, themeTransition } = rc;
 
-    // 1. Sky vertical gradient
+    // 1. Sky vertical gradient (Day from Screenshot_2.png, Night from Screenshot_1.png)
     const topColor = lerpColor(DAY_PALETTE.skyTop, NIGHT_PALETTE.skyTop, themeTransition);
     const midColor = lerpColor(DAY_PALETTE.skyMiddle, NIGHT_PALETTE.skyMiddle, themeTransition);
-    const botColor = lerpColor(DAY_PALETTE.skyBottom, NIGHT_PALETTE.skyBottom, themeTransition);
+    const botColor = lerpColor(DAY_PALETTE.skyHorizon, NIGHT_PALETTE.skyHorizon, themeTransition);
 
     const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
     skyGrad.addColorStop(0, topColor);
-    skyGrad.addColorStop(0.55, midColor);
+    skyGrad.addColorStop(0.50, midColor);
+    skyGrad.addColorStop(0.85, botColor);
     skyGrad.addColorStop(1, botColor);
 
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Sun or Moon celestial ambient glow
-    // Day sun: warm radial glow in the upper sky
-    const sunGlowColor = lerpColor(DAY_PALETTE.sunOrMoonGlow, NIGHT_PALETTE.sunOrMoonGlow, themeTransition);
-    const sunX = width * 0.7;
-    const sunY = height * 0.22;
-    const sunRadius = Math.max(width, height) * 0.35;
+    // 2. Horizon warm underglow mist (signature night atmospheric glow from Screenshot_1.png)
+    if (themeTransition > 0.05) {
+      const mistColor = lerpColor(
+        DAY_PALETTE.horizonMistGlow,
+        NIGHT_PALETTE.horizonMistGlow,
+        themeTransition
+      );
+      const mistY = height * 0.88;
+      const mistGrad = ctx.createRadialGradient(
+        width * 0.5,
+        mistY,
+        width * 0.05,
+        width * 0.5,
+        mistY,
+        width * 0.75
+      );
+      mistGrad.addColorStop(0, mistColor);
+      mistGrad.addColorStop(
+        0.55,
+        `rgba(215, 125, 45, ${0.30 * themeTransition})`
+      );
+      mistGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-    const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, sunRadius);
-    sunGrad.addColorStop(0, sunGlowColor);
-    sunGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = mistGrad;
+      ctx.fillRect(0, height * 0.5, width, height * 0.5);
 
-    ctx.fillStyle = sunGrad;
-    ctx.fillRect(0, 0, width, height);
-
-    // 3. Horizon atmospheric warmth/glow
-    const horizonGlowColor = lerpColor(DAY_PALETTE.horizonGlow, NIGHT_PALETTE.horizonGlow, themeTransition);
-    const horizonY = height * 0.65;
-    const horizonGrad = ctx.createRadialGradient(width * 0.5, horizonY, 20, width * 0.5, horizonY, width * 0.7);
-    horizonGrad.addColorStop(0, horizonGlowColor);
-    horizonGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-    ctx.fillStyle = horizonGrad;
-    ctx.fillRect(0, 0, width, height);
+      // Low ground-level warm haze strip
+      const groundHazeGrad = ctx.createLinearGradient(0, height * 0.72, 0, height);
+      groundHazeGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      groundHazeGrad.addColorStop(
+        1,
+        `rgba(195, 115, 45, ${0.38 * themeTransition})`
+      );
+      ctx.fillStyle = groundHazeGrad;
+      ctx.fillRect(0, height * 0.72, width, height * 0.28);
+    }
   }
 }

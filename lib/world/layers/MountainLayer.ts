@@ -3,85 +3,72 @@ import { DAY_PALETTE, NIGHT_PALETTE } from '../constants';
 import { lerpColor } from '../color';
 import { createPRNG, randomRange } from '../random';
 
-interface MountainProfile {
+interface MountainRidge {
   points: { nx: number; ny: number }[];
-  parallaxFactor: number;
+  parallax: number;
 }
 
 export class MountainLayer implements WorldLayer {
   id = 'mountains';
 
-  private farProfile: MountainProfile;
-  private midProfile: MountainProfile;
-  private nearProfile: MountainProfile;
+  private farRidge: MountainRidge;
+  private midRidge: MountainRidge;
 
   constructor() {
-    this.farProfile = this.generateProfile(101, 0.44, 0.54, 18, 0.08);
-    this.midProfile = this.generateProfile(202, 0.50, 0.60, 16, 0.15);
-    this.nearProfile = this.generateProfile(303, 0.56, 0.66, 14, 0.22);
+    this.farRidge = this.generateCrystallineRidge(123, 0.28, 0.42, 28, 0.08);
+    this.midRidge = this.generateCrystallineRidge(456, 0.35, 0.48, 24, 0.14);
   }
 
-  private generateProfile(
+  // Generates angular, faceted crystalline mountain peaks like in Screenshot_2.png
+  private generateCrystallineRidge(
     seed: number,
     minY: number,
     maxY: number,
     segments: number,
     parallax: number
-  ): MountainProfile {
+  ): MountainRidge {
     const prng = createPRNG(seed);
     const points: { nx: number; ny: number }[] = [];
 
-    // Start slightly off-canvas on the left
-    points.push({ nx: -0.1, ny: randomRange(prng, minY + 0.04, maxY) });
+    points.push({ nx: -0.1, ny: maxY });
 
     for (let i = 0; i <= segments; i++) {
       const nx = i / segments;
-      // create natural rolling peaks with higher peaks in center-right
-      const wave = Math.sin(nx * Math.PI) * 0.05;
-      const ny = randomRange(prng, minY - wave, maxY - wave);
+      // Alternate between sharp peaks and valleys
+      const isPeak = i % 2 === 1;
+      const ny = isPeak
+        ? randomRange(prng, minY, minY + (maxY - minY) * 0.45)
+        : randomRange(prng, minY + (maxY - minY) * 0.55, maxY);
       points.push({ nx, ny });
     }
 
-    // End slightly off-canvas on the right
-    points.push({ nx: 1.1, ny: randomRange(prng, minY + 0.04, maxY) });
+    points.push({ nx: 1.1, ny: maxY });
 
-    return { points, parallaxFactor: parallax };
+    return { points, parallax };
   }
 
-  private drawMountain(
+  private drawRidge(
     ctx: CanvasRenderingContext2D,
     width: number,
     height: number,
-    profile: MountainProfile,
+    ridge: MountainRidge,
     fillColor: string,
-    parallaxOffsetX: number
+    parallaxX: number
   ) {
     ctx.fillStyle = fillColor;
     ctx.beginPath();
 
-    const pts = profile.points;
-    const startX = pts[0].nx * width + parallaxOffsetX;
+    const pts = ridge.points;
+    const startX = pts[0].nx * width + parallaxX;
     const startY = pts[0].ny * height;
     ctx.moveTo(startX, startY);
 
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p0 = pts[i];
-      const p1 = pts[i + 1];
-
-      const x0 = p0.nx * width + parallaxOffsetX;
-      const y0 = p0.ny * height;
-      const x1 = p1.nx * width + parallaxOffsetX;
-      const y1 = p1.ny * height;
-
-      // Smooth curve through midpoints
-      const midX = (x0 + x1) / 2;
-      const midY = (y0 + y1) / 2;
-
-      ctx.quadraticCurveTo(x0, y0, midX, midY);
+    for (let i = 1; i < pts.length; i++) {
+      const px = pts[i].nx * width + parallaxX;
+      const py = pts[i].ny * height;
+      ctx.lineTo(px, py);
     }
 
-    const last = pts[pts.length - 1];
-    ctx.lineTo(last.nx * width + parallaxOffsetX, last.ny * height);
     ctx.lineTo(width + 50, height);
     ctx.lineTo(-50, height);
     ctx.closePath();
@@ -91,19 +78,33 @@ export class MountainLayer implements WorldLayer {
   render(rc: RenderContext): void {
     const { ctx, width, height, themeTransition, pointer, reducedMotion } = rc;
 
+    // Soften mountains in night mode to let the amber horizon mist shine (from Screenshot_1)
+    const mountainAlpha = 1 - themeTransition * 0.75;
+    if (mountainAlpha <= 0.02) return;
+
+    ctx.save();
+    ctx.globalAlpha = mountainAlpha;
+
     const farColor = lerpColor(DAY_PALETTE.mountainFar, NIGHT_PALETTE.mountainFar, themeTransition);
     const midColor = lerpColor(DAY_PALETTE.mountainMid, NIGHT_PALETTE.mountainMid, themeTransition);
-    const nearColor = lerpColor(DAY_PALETTE.mountainNear, NIGHT_PALETTE.mountainNear, themeTransition);
 
     const pX = !reducedMotion && pointer.active ? pointer.x : 0;
 
-    // 1. Far mountain range
-    this.drawMountain(ctx, width, height, this.farProfile, farColor, pX * this.farProfile.parallaxFactor * 20);
+    // 1. Far mountain range (crystalline peaks)
+    this.drawRidge(ctx, width, height, this.farRidge, farColor, pX * this.farRidge.parallax * 20);
 
     // 2. Mid mountain range
-    this.drawMountain(ctx, width, height, this.midProfile, midColor, pX * this.midProfile.parallaxFactor * 25);
+    this.drawRidge(ctx, width, height, this.midRidge, midColor, pX * this.midRidge.parallax * 25);
 
-    // 3. Near mountain range
-    this.drawMountain(ctx, width, height, this.nearProfile, nearColor, pX * this.nearProfile.parallaxFactor * 30);
+    // 3. Valley atmospheric haze strip at foot of mountains (seen in Screenshot_2.png)
+    const hazeColor = lerpColor(DAY_PALETTE.mountainHaze, NIGHT_PALETTE.mountainHaze, themeTransition);
+    const hazeGrad = ctx.createLinearGradient(0, height * 0.40, 0, height * 0.55);
+    hazeGrad.addColorStop(0, 'rgba(215, 225, 235, 0)');
+    hazeGrad.addColorStop(0.6, hazeColor);
+    hazeGrad.addColorStop(1, 'rgba(215, 225, 235, 0)');
+    ctx.fillStyle = hazeGrad;
+    ctx.fillRect(0, height * 0.40, width, height * 0.15);
+
+    ctx.restore();
   }
 }

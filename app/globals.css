@@ -1,15 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fbf9f5;
-  --foreground: #1e293b;
+  --background: #000000;
+  --surface: #000000;
+  --elevated: #141414;
+  --foreground: #ffffff;
+  --muted: #949494;
+  --border: rgba(255, 255, 255, 0.12);
+  --focus-ring: rgb(55, 151, 240);
+  --radius: 0.625rem;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-focus: var(--focus-ring);
+
+  --font-serif: var(--font-serif), Georgia, serif;
+  --font-sans: var(--font-sans), Inter, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 html,
@@ -19,11 +31,36 @@ body {
   overflow: hidden;
   margin: 0;
   padding: 0;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-sans), Inter, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Accessible focus ring from the design system specification: rgb(55, 151, 240) solid 3px, 2px offset */
+*:focus-visible {
+  outline: 3px solid rgb(55, 151, 240) !important;
+  outline-offset: 2px !important;
+}
+
 ::selection {
-  background-color: rgba(245, 184, 42, 0.35);
-  color: inherit;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Custom scrollbar for inner scrollable cards */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333333;
 }

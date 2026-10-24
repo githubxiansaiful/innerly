@@ -1,101 +1,152 @@
 export interface Palette {
   skyTop: string;
   skyMiddle: string;
-  skyBottom: string;
+  skyHorizon: string;
   sunOrMoonGlow: string;
-  horizonGlow: string;
+  horizonMistGlow: string;
 
   mountainFar: string;
   mountainMid: string;
   mountainNear: string;
+  mountainHaze: string;
 
   cloudMist: string;
 
   hillFar: string;
   hillMid: string;
   hillNear: string;
+  hillShadow: string;
+
+  treeTrunk: string;
+  treeFoliageLight: string;
+  treeFoliageDark: string;
+  treeShadow: string;
 
   grassBase: string;
   grassTip: string;
-  flowerStem: string;
-  flowerLeaf: string;
+  grassTick: string;
+
+  stemHighlight: string;
+  stemBase: string;
+  stemShadow: string;
+  stemCastShadow: string;
+  leafColor: string;
 
   sunflowerPetalOuter: string;
   sunflowerPetalInner: string;
-  sunflowerPetalShadow: string;
+  sunflowerPetalCrease: string;
   sunflowerCenterDark: string;
   sunflowerCenterRing: string;
   sunflowerCenterLight: string;
-  sunflowerGlow: string;
+  sunflowerLanternGlow: string;
 
   particleColor: string;
   particleGlow: string;
+  bokehWarm: string;
+  bokehCool: string;
 }
 
 export const DAY_PALETTE: Palette = {
-  skyTop: '#C8E4F8',        // soft daytime sky
-  skyMiddle: '#E2F0FB',     // gentle atmospheric haze
-  skyBottom: '#FFF5E4',     // warm golden horizon glow
-  sunOrMoonGlow: 'rgba(255, 238, 190, 0.45)',
-  horizonGlow: 'rgba(255, 225, 175, 0.35)',
+  // Day Sky based on Screenshot_2.png (pale pastel grey-blue fading to misty white horizon)
+  skyTop: '#D6DEE5',
+  skyMiddle: '#E7ECF0',
+  skyHorizon: '#F2F5F8',
+  sunOrMoonGlow: 'rgba(255, 255, 255, 0.4)',
+  horizonMistGlow: 'rgba(235, 243, 248, 0.5)',
 
-  mountainFar: '#9EADC2',   // pale blue-grey distant peak
-  mountainMid: '#7C8FA7',   // mid-distance ridge
-  mountainNear: '#62768E',  // near mountain range
+  // Mountains based on Screenshot_2.png (pale crystalline lavender-grey silhouettes)
+  mountainFar: '#D2D9E0',
+  mountainMid: '#B8C4D0',
+  mountainNear: '#A3B2C0',
+  mountainHaze: '#DDE4EB',
 
-  cloudMist: 'rgba(255, 255, 255, 0.65)',
+  cloudMist: 'rgba(255, 255, 255, 0.7)',
 
-  hillFar: '#6F9D68',       // soft distant rolling green
-  hillMid: '#54874E',       // mid rolling meadow
-  hillNear: '#3C6F36',      // rich foreground hill
+  // Hills based on Screenshot_2.png (vibrant pastel meadow greens)
+  hillFar: '#A8D47C',
+  hillMid: '#95C968',
+  hillNear: '#82BE56',
+  hillShadow: 'rgba(90, 145, 50, 0.25)',
 
-  grassBase: '#2E5A29',
-  grassTip: '#7EB35D',
-  flowerStem: '#3E6F33',
-  flowerLeaf: '#4D8240',
+  // Tree based on Screenshot_2.png
+  treeTrunk: '#6F4E37',
+  treeFoliageLight: '#72B562',
+  treeFoliageDark: '#569947',
+  treeShadow: 'rgba(80, 130, 50, 0.35)',
 
-  sunflowerPetalOuter: '#F8BE1F',
+  grassBase: '#6AA842',
+  grassTip: '#8BC34A',
+  grassTick: '#5C9A36',
+
+  // Stems with cylindrical 3D shading
+  stemHighlight: '#68A858',
+  stemBase: '#4E8A42',
+  stemShadow: '#366E2D',
+  stemCastShadow: 'rgba(60, 110, 40, 0.35)',
+  leafColor: '#529642',
+
+  // Petals based on Screenshot_2.png (golden yellow, crease texture, inner contrast)
+  sunflowerPetalOuter: '#F8BA1C',
   sunflowerPetalInner: '#FFA705',
-  sunflowerPetalShadow: '#D97A00',
-  sunflowerCenterDark: '#2C1B10',
-  sunflowerCenterRing: '#54361C',
-  sunflowerCenterLight: '#7E532B',
-  sunflowerGlow: 'rgba(255, 215, 80, 0.25)',
+  sunflowerPetalCrease: '#D47A00',
+  sunflowerCenterDark: '#3A1E0D',
+  sunflowerCenterRing: '#623819',
+  sunflowerCenterLight: '#8C5226',
+  sunflowerLanternGlow: 'rgba(255, 220, 100, 0.2)',
 
-  particleColor: 'rgba(255, 248, 220, 0.7)',
-  particleGlow: 'rgba(255, 230, 150, 0.3)',
+  // Dandelion fluff / white pollen
+  particleColor: 'rgba(255, 255, 255, 0.85)',
+  particleGlow: 'rgba(255, 255, 255, 0.4)',
+  bokehWarm: 'rgba(255, 230, 160, 0.3)',
+  bokehCool: 'rgba(220, 245, 255, 0.3)',
 };
 
 export const NIGHT_PALETTE: Palette = {
-  skyTop: '#060B18',        // deep navy midnight sky
-  skyMiddle: '#0C162E',     // deep midnight blue
-  skyBottom: '#182548',     // horizon blue-indigo glow
-  sunOrMoonGlow: 'rgba(160, 195, 255, 0.25)',
-  horizonGlow: 'rgba(75, 110, 175, 0.25)',
+  // Night Sky based on Screenshot_1.png (deep midnight navy to dusky teal-navy twilight)
+  skyTop: '#040814',
+  skyMiddle: '#122030',
+  skyHorizon: '#23252E',
+  sunOrMoonGlow: 'rgba(140, 185, 240, 0.15)',
+  horizonMistGlow: 'rgba(215, 135, 55, 0.45)', // signature warm amber horizon underglow
 
-  mountainFar: '#121A2C',   // faint indigo mountain silhouette
-  mountainMid: '#0D1424',   // mid silhouette
-  mountainNear: '#090E1A',  // near mountain silhouette
+  mountainFar: '#0C1320',
+  mountainMid: '#090E18',
+  mountainNear: '#060A12',
+  mountainHaze: '#141E2E',
 
-  cloudMist: 'rgba(40, 60, 100, 0.22)',
+  cloudMist: 'rgba(25, 40, 65, 0.15)',
 
-  hillFar: '#152C22',       // deep dusky emerald hill
-  hillMid: '#0F221B',       // dark twilight green
-  hillNear: '#0A1813',      // midnight deep foliage
+  // Hills in night mode (dark meadow silhouettes)
+  hillFar: '#10221A',
+  hillMid: '#0C1A14',
+  hillNear: '#07100D',
+  hillShadow: 'rgba(0, 0, 0, 0.4)',
+
+  treeTrunk: '#13110E',
+  treeFoliageLight: '#183020',
+  treeFoliageDark: '#102216',
+  treeShadow: 'rgba(0, 0, 0, 0.5)',
 
   grassBase: '#08140F',
   grassTip: '#1D3B2C',
-  flowerStem: '#13281C',
-  flowerLeaf: '#173323',
+  grassTick: '#152E20',
 
-  sunflowerPetalOuter: '#C99324',
-  sunflowerPetalInner: '#9C6E15',
-  sunflowerPetalShadow: '#6E4907',
-  sunflowerCenterDark: '#120B06',
-  sunflowerCenterRing: '#26180C',
-  sunflowerCenterLight: '#3D2614',
-  sunflowerGlow: 'rgba(255, 195, 80, 0.35)',
+  stemHighlight: '#2A4A33',
+  stemBase: '#1B3323',
+  stemShadow: '#112217',
+  stemCastShadow: 'rgba(0, 0, 0, 0.3)',
+  leafColor: '#24452E',
+
+  sunflowerPetalOuter: '#F5B014',
+  sunflowerPetalInner: '#DE9608',
+  sunflowerPetalCrease: '#8C5604',
+  sunflowerCenterDark: '#1C1108',
+  sunflowerCenterRing: '#3A2412',
+  sunflowerCenterLight: '#593B20',
+  sunflowerLanternGlow: 'rgba(255, 205, 80, 0.9)',
 
   particleColor: 'rgba(255, 210, 120, 0.85)',
-  particleGlow: 'rgba(255, 190, 80, 0.45)',
+  particleGlow: 'rgba(255, 180, 70, 0.5)',
+  bokehWarm: 'rgba(245, 160, 50, 0.65)',
+  bokehCool: 'rgba(170, 235, 210, 0.55)',
 };
