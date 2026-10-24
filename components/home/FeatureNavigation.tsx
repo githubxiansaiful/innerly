@@ -47,7 +47,7 @@ export function FeatureNavigation() {
   const [chatMessages, setChatMessages] = useState<{ sender: 'ai' | 'user'; text: string }[]>([
     {
       sender: 'ai',
-      text: 'Hello. I am Innerly’s AI companion. There is no pressure here. What is on your mind today?',
+      text: 'Hello. I am Miwa’s AI companion. There is no pressure here. What is on your mind today?',
     },
   ]);
   const [userChatInput, setUserChatInput] = useState('');

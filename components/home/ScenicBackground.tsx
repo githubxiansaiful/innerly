@@ -59,7 +59,7 @@ export function ScenicBackground({ theme, onThemeChange }: ScenicBackgroundProps
     <iframe
       ref={iframeRef}
       src="/home-bg.html"
-      title="Innerly Living Landscape Background"
+      title="Miwa Living Landscape Background"
       onLoad={handleLoad}
       className="absolute inset-0 w-full h-full border-0 pointer-events-auto z-0"
       tabIndex={-1}

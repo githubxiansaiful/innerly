@@ -44,7 +44,7 @@ export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
   const clockTextClass = isDay ? 'text-[#16324a]/80' : 'text-white/90';
 
   return (
-    <header className="fixed top-5 sm:top-6 inset-x-0 mx-auto w-[94%] max-w-[1232px] z-50 flex items-center justify-between pointer-events-none select-none">
+    <header className="fixed top-5 sm:top-6 inset-x-0 mx-auto w-[94%] max-w-[1232px] z-50 relative flex items-center justify-between pointer-events-none select-none">
       {/* Left: Brand Pill matching Screenshot_5 */}
       <div
         className={`liquid-glass-pill px-5 py-1 sm:py-1.5 rounded-full pointer-events-auto flex items-center justify-center transition-all duration-150 ${textClass}`}
@@ -54,13 +54,13 @@ export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
         </span>
       </div>
 
-      {/* Center: Clock Pill matching Screenshot_5 */}
+      {/* Center: Clock Pill matching user's exact specification */}
       <div
-        className={`liquid-glass-pill px-5 py-2.5 rounded-full pointer-events-auto hidden sm:flex items-center justify-center transition-all duration-150 ${clockTextClass}`}
+        data-sky-avoid="true"
+        className="zuzu-clock absolute left-[calc(50%-12px)] sm:left-1/2 -translate-x-1/2 text-[0.625rem] md:text-xs tracking-[0.2em] sm:tracking-[0.3em] font-medium opacity-60 uppercase z-50 top-1/2 -translate-y-1/2 px-3 sm:px-4 py-2 rounded-full backdrop-blur-md border text-night-ink bg-white/5 border-white/10 pointer-events-auto"
+        style={{ opacity: 1, transform: 'none' }}
       >
-        <span className="font-sans text-[12px] font-semibold tracking-[0.25em]">
-          {timeString || '12:00 AM'}
-        </span>
+        {timeString || '01:23 AM'}
       </div>
 
       {/* Right: Three Action Buttons matching Screenshot_5 */}
