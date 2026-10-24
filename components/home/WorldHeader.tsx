@@ -41,13 +41,12 @@ export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
 
   const isDay = theme === 'day';
   const textClass = isDay ? 'text-[#16324a]' : 'text-white';
-  const clockTextClass = isDay ? 'text-[#16324a]/80' : 'text-white/90';
 
   return (
     <header className="fixed top-5 sm:top-6 inset-x-0 mx-auto w-[94%] max-w-[1232px] z-50 relative flex items-center justify-between pointer-events-none select-none">
       {/* Left: Brand Pill matching Screenshot_5 */}
       <div
-        className={`liquid-glass-pill px-5 py-1 sm:py-1.5 rounded-full pointer-events-auto flex items-center justify-center transition-all duration-150 ${textClass}`}
+        className={`liquid-glass px-5 py-1 sm:py-1.5 rounded-full pointer-events-auto flex items-center justify-center transition-all duration-150 ${textClass}`}
       >
         <span className="font-serif text-[28px] sm:text-[30px] font-normal leading-[1.1] tracking-[-0.5px]">
           Miwa
@@ -69,7 +68,7 @@ export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
         <button
           type="button"
           onClick={toggleSound}
-          className={`liquid-glass-pill w-[38px] h-[38px] rounded-full flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer hover:border-white/30 ${textClass}`}
+          className={`liquid-glass w-[38px] h-[38px] rounded-full flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer hover:bg-white/[0.05] ${textClass}`}
           aria-label={isPlaying ? 'Pause ambient sound' : 'Play ambient sound'}
           title={isPlaying ? 'Sound playing (click to mute)' : 'Sound muted (click to play)'}
         >
@@ -109,7 +108,7 @@ export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
         <button
           type="button"
           onClick={onToggleTheme}
-          className={`liquid-glass-pill w-[38px] h-[38px] rounded-full flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer hover:border-white/30 ${textClass}`}
+          className={`liquid-glass w-[38px] h-[38px] rounded-full flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer hover:bg-white/[0.05] ${textClass}`}
           aria-label={isDay ? 'Switch to night mode' : 'Switch to day mode'}
           title={isDay ? 'Day active (switch to night)' : 'Night active (switch to day)'}
         >
@@ -147,7 +146,7 @@ export function WorldHeader({ theme, onToggleTheme }: WorldHeaderProps) {
         <button
           type="button"
           onClick={toggleA11y}
-          className={`liquid-glass-pill w-[38px] h-[38px] rounded-full flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer hover:border-white/30 ${
+          className={`liquid-glass w-[38px] h-[38px] rounded-full flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer hover:bg-white/[0.05] ${
             a11yHighContrast ? 'ring-2 ring-blue-400' : ''
           } ${textClass}`}
           aria-label="Toggle accessibility enhancements"

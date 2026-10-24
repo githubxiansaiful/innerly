@@ -30,11 +30,19 @@
   --glass-blur: blur(4px);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
-  background: #ffffff03;
-  border: none;
   position: relative;
+  box-shadow: rgba(255, 255, 255, 0.1) 0px 1px 1px inset;
+  background: rgba(255, 255, 255, 0.01);
+  border-width: medium;
+  border-style: none;
+  border-color: currentcolor;
+  border-image: none;
   overflow: hidden;
-  box-shadow: inset 0 1px 1px #ffffff1a;
+}
+
+[data-theme="day"] .liquid-glass {
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: rgba(255, 255, 255, 0.6) 0px 1px 1px inset;
 }
 
 .liquid-glass-pill {

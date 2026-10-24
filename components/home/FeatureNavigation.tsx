@@ -98,10 +98,10 @@ export function FeatureNavigation() {
     <>
       {/* Bottom Floating Monochrome Dock (4px grid, pill buttons, flat) */}
       <nav
-        aria-label="Innerly navigation"
+        aria-label="Miwa navigation"
         className="fixed bottom-6 inset-x-0 mx-auto w-[94%] max-w-2xl z-60 flex items-center justify-center pointer-events-auto"
       >
-        <div className="flex items-center space-x-1 sm:space-x-2 bg-[#000000]/90 backdrop-blur-md p-1.5 rounded-full border border-white/15 shadow-none overflow-x-auto max-w-full">
+        <div className="flex items-center space-x-1 sm:space-x-2 liquid-glass p-1.5 rounded-full overflow-x-auto max-w-full">
           <Button
             variant="default"
             size="sm"
